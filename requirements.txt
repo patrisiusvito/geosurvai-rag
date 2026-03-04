@@ -1,0 +1,21 @@
+# === LLM ===
+ollama==0.6.1
+
+# === Database ===
+duckdb==1.2.1
+
+# === API Server ===
+fastapi==0.115.0
+uvicorn==0.34.0
+pydantic==2.10.0
+
+# === Data Processing ===
+pandas==2.2.3
+openpyxl==3.1.5
+
+# === HTTP Client ===
+httpx==0.28.0
+
+# === Utilities ===
+python-dotenv==1.0.1
+loguru==0.7.3
