@@ -5,8 +5,13 @@ Place at: app/scraper/browser.py
 Opens ONE browser session, logs in once, then visits all targets:
 - Dashboard pages: screenshot + text extraction
 - Table pages: click Export and download Excel
+
+Supports two modes:
+- Local:  Uses Chrome profile for saved login cookies
+- Cloud:  Uses headless Chromium + email/password login (set GEOSURVAI_EMAIL env var)
 """
 import asyncio
+import os
 import shutil
 from pathlib import Path
 from datetime import datetime
@@ -17,7 +22,7 @@ from loguru import logger
 class MultiDashboardScraper:
     """
     Scrapes multiple dashboard/table URLs in a single browser session.
-    Reuses Chrome profile for saved login cookies.
+    Auto-detects cloud vs local mode based on GEOSURVAI_EMAIL env var.
     """
 
     def __init__(self, config: dict):
@@ -37,6 +42,21 @@ class MultiDashboardScraper:
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.screenshots_dir.mkdir(parents=True, exist_ok=True)
 
+        # Cloud mode: use email/password from env vars instead of Chrome profile
+        self.cloud_mode = os.getenv("GEOSURVAI_EMAIL", "") != ""
+        if self.cloud_mode:
+            logger.info("Cloud mode detected (GEOSURVAI_EMAIL is set)")
+            # Override login config with env vars
+            self.login = {
+                "username": os.getenv("GEOSURVAI_EMAIL", ""),
+                "password": os.getenv("GEOSURVAI_PASSWORD", ""),
+                "login_url": os.getenv("GEOSURVAI_LOGIN_URL", "https://geosurvai.com/login"),
+                "username_field": 'input[type="email"], input[placeholder*="email" i], input[name="email"]',
+                "password_field": 'input[type="password"], input[placeholder*="password" i], input[name="password"]',
+                "login_button": 'button[type="submit"], input[type="submit"]',
+                "wait_after_login": 5,
+            }
+
     async def run(self) -> dict:
         """Run all targets sequentially in one browser session."""
         from playwright.async_api import async_playwright
@@ -55,58 +75,81 @@ class MultiDashboardScraper:
             return result
 
         async with async_playwright() as p:
-            # Launch browser with Chrome profile for saved cookies
-            launch_args = {
-                "headless": self.headless,
-                "downloads_path": str(self.download_dir),
-            }
+            browser = None
+            context = None
+            page = None
 
-            # Try to use Chrome user data dir for saved login
-            context_args = {
-                "accept_downloads": True,
-                "viewport": {"width": 1920, "height": 1080},
-            }
-
-            use_chrome_profile = (
-                self.chrome_user_data
-                and Path(self.chrome_user_data).exists()
-            )
-
-            if use_chrome_profile:
-                logger.info(f"Using Chrome profile: {self.chrome_user_data}")
-                try:
-                    # Launch persistent context (reuses Chrome cookies)
-                    context = await p.chromium.launch_persistent_context(
-                        user_data_dir=str(Path(self.chrome_user_data) / self.chrome_profile),
-                        headless=self.headless,
-                        accept_downloads=True,
-                        viewport={"width": 1920, "height": 1080},
-                        downloads_path=str(self.download_dir),
-                    )
-                    page = context.pages[0] if context.pages else await context.new_page()
-                    browser = None  # persistent context manages its own browser
-                    logger.info("Chrome profile loaded successfully")
-                except Exception as e:
-                    logger.warning(f"Chrome profile failed: {e}. Falling back to fresh browser.")
-                    use_chrome_profile = False
-
-            if not use_chrome_profile:
-                browser = await p.chromium.launch(**launch_args)
-                context = await browser.new_context(**context_args)
+            # ── Mode selection ──────────────────────────────────────
+            if self.cloud_mode:
+                # CLOUD MODE: headless Chromium + credential login
+                logger.info("Launching headless Chromium (cloud mode)")
+                browser = await p.chromium.launch(
+                    headless=True,
+                    args=["--no-sandbox", "--disable-dev-shm-usage"],
+                )
+                context = await browser.new_context(
+                    accept_downloads=True,
+                    viewport={"width": 1920, "height": 1080},
+                )
                 page = await context.new_page()
 
+                # Login with credentials
+                logger.info("Logging in with email/password...")
+                await self._login(page)
+
+            else:
+                # LOCAL MODE: try Chrome profile for saved cookies
+                launch_args = {
+                    "headless": self.headless,
+                    "downloads_path": str(self.download_dir),
+                }
+                context_args = {
+                    "accept_downloads": True,
+                    "viewport": {"width": 1920, "height": 1080},
+                }
+
+                use_chrome_profile = (
+                    self.chrome_user_data
+                    and Path(self.chrome_user_data).exists()
+                )
+
+                if use_chrome_profile:
+                    logger.info(f"Using Chrome profile: {self.chrome_user_data}")
+                    try:
+                        context = await p.chromium.launch_persistent_context(
+                            user_data_dir=str(Path(self.chrome_user_data) / self.chrome_profile),
+                            headless=self.headless,
+                            accept_downloads=True,
+                            viewport={"width": 1920, "height": 1080},
+                            downloads_path=str(self.download_dir),
+                        )
+                        page = context.pages[0] if context.pages else await context.new_page()
+                        browser = None  # persistent context manages its own browser
+                        logger.info("Chrome profile loaded successfully")
+                    except Exception as e:
+                        logger.warning(f"Chrome profile failed: {e}. Falling back to fresh browser.")
+                        use_chrome_profile = False
+
+                if not use_chrome_profile:
+                    browser = await p.chromium.launch(**launch_args)
+                    context = await browser.new_context(**context_args)
+                    page = await context.new_page()
+
+            # ── Process targets ─────────────────────────────────────
             try:
                 # Check if login is needed (try first target URL)
                 first_url = self.targets[0]["url"]
                 await page.goto(first_url, wait_until="networkidle", timeout=60000)
                 await page.wait_for_timeout(3000)
 
-                # Detect login page (check if redirected to login)
+                # Detect login page redirect (for local mode without cookies)
                 current_url = page.url.lower()
                 if "login" in current_url or "signin" in current_url or "auth" in current_url:
-                    logger.info("Login page detected, attempting login...")
-                    await self._login(page)
-                    # After login, navigate back to first target
+                    if not self.cloud_mode:
+                        # Cloud mode already logged in above
+                        logger.info("Login page detected, attempting login...")
+                        await self._login(page)
+                    # Navigate back to first target after login
                     await page.goto(first_url, wait_until="networkidle", timeout=60000)
 
                 # Process each target
@@ -142,7 +185,11 @@ class MultiDashboardScraper:
         """Handle login using configured credentials."""
         login_cfg = self.login
         if not login_cfg.get("username") or not login_cfg.get("password"):
-            logger.warning("No login credentials configured. Set GEOSURVAI_USER and GEOSURVAI_PASS env vars.")
+            logger.warning("No login credentials configured.")
+            if self.cloud_mode:
+                logger.error("Set GEOSURVAI_EMAIL and GEOSURVAI_PASSWORD env vars (HF Spaces secrets).")
+            else:
+                logger.warning("Set GEOSURVAI_USER and GEOSURVAI_PASS env vars, or use Chrome profile.")
             return
 
         login_url = login_cfg.get("login_url", "")
@@ -150,22 +197,36 @@ class MultiDashboardScraper:
             await page.goto(login_url, wait_until="networkidle", timeout=30000)
 
         try:
+            # Fill email field
             await page.fill(
                 login_cfg.get("username_field", "input[type='email']"),
                 login_cfg["username"]
             )
+            # Fill password field
             await page.fill(
                 login_cfg.get("password_field", "input[type='password']"),
                 login_cfg["password"]
             )
+            # Click login button
             await page.click(
                 login_cfg.get("login_button", "button[type='submit']")
             )
             wait_s = login_cfg.get("wait_after_login", 5)
             await page.wait_for_timeout(wait_s * 1000)
-            logger.info("Login completed")
+
+            # Verify login success
+            current_url = page.url.lower()
+            if "login" in current_url or "signin" in current_url:
+                logger.error(f"Login may have failed - still on: {page.url}")
+                await page.screenshot(path=str(self.screenshots_dir / "login_debug.png"))
+            else:
+                logger.info(f"Login completed, redirected to: {page.url}")
         except Exception as e:
             logger.error(f"Login failed: {e}")
+            try:
+                await page.screenshot(path=str(self.screenshots_dir / "login_error.png"))
+            except Exception:
+                pass
 
     async def _process_target(self, page, target: dict) -> dict:
         """Process a single target (screenshot and/or download)."""

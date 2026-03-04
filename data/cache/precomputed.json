@@ -1,0 +1,169 @@
+{
+  "brief": {
+    "survey": {
+      "total": 37.0,
+      "berjalan": 11.0,
+      "selesai": 2.0,
+      "belum_mulai": 24.0,
+      "total_afe": 299133258.0,
+      "realisasi_afe": 2459383.0,
+      "total_mmboe": 2791.14,
+      "avg_progress": 3.7,
+      "seismik_2d": 10.0,
+      "seismik_3d": 20.0,
+      "survey_lain": 7.0,
+      "onshore": 10.0,
+      "offshore": 8.0
+    },
+    "study": {
+      "total": 187.0,
+      "belum_mulai": 187.0,
+      "selesai": 0.0,
+      "total_anggaran": 30435555.0,
+      "realisasi_anggaran": 0.0
+    },
+    "study_by_type": [
+      {
+        "tipe": "Studi G&G",
+        "jumlah": 86
+      },
+      {
+        "tipe": "Lab Analysis",
+        "jumlah": 69
+      },
+      {
+        "tipe": "Reprocessing",
+        "jumlah": 24
+      },
+      {
+        "tipe": "Studi MNK",
+        "jumlah": 8
+      }
+    ],
+    "by_region": [
+      {
+        "region": "Sulawesi",
+        "jumlah_survei": 4,
+        "avg_progress": 0.0,
+        "total_mmboe": 1301.1,
+        "total_afe": 39513057.0
+      },
+      {
+        "region": "Papua dan Maluku",
+        "jumlah_survei": 2,
+        "avg_progress": 9.4,
+        "total_mmboe": 501.4,
+        "total_afe": 111696013.0
+      },
+      {
+        "region": "Jawa, Bali, dan Nusa Tenggara",
+        "jumlah_survei": 1,
+        "avg_progress": 0.0,
+        "total_mmboe": 420.2,
+        "total_afe": 3178532.0
+      },
+      {
+        "region": "nan",
+        "jumlah_survei": 20,
+        "avg_progress": 0.9,
+        "total_mmboe": 308.6,
+        "total_afe": 102781811.0
+      },
+      {
+        "region": "Sumatera",
+        "jumlah_survei": 6,
+        "avg_progress": 16.7,
+        "total_mmboe": 259.8,
+        "total_afe": 32909143.0
+      },
+      {
+        "region": "Kalimantan",
+        "jumlah_survei": 4,
+        "avg_progress": 0.0,
+        "total_mmboe": 0.0,
+        "total_afe": 9054703.0
+      }
+    ],
+    "top_holdings": [
+      {
+        "HOLDING": "PERTAMINA",
+        "jumlah": 14,
+        "avg_progress": 7.1,
+        "total_mmboe": 165.9
+      },
+      {
+        "HOLDING": "ENI",
+        "jumlah": 5,
+        "avg_progress": 0.0,
+        "total_mmboe": 0.0
+      },
+      {
+        "HOLDING": "SAKA",
+        "jumlah": 3,
+        "avg_progress": 5.7,
+        "total_mmboe": 308.6
+      },
+      {
+        "HOLDING": "MEDCO",
+        "jumlah": 3,
+        "avg_progress": 0.0,
+        "total_mmboe": 0.0
+      },
+      {
+        "HOLDING": "BPHE",
+        "jumlah": 2,
+        "avg_progress": 0.0,
+        "total_mmboe": 420.2
+      }
+    ],
+    "generated_at": "2026-03-04T10:18:56.274938"
+  },
+  "risks": [
+    {
+      "severity": "HIGH",
+      "category": "Keterlambatan Survei",
+      "message": "4 survei terlambat dengan potensi total 731.7 MMBOE",
+      "details": [
+        {
+          "NAMA_KEGIATAN": "Akuisisi Seismik 2D Laut Kasuari sepanjang 773 Km",
+          "WK": "BAWEAN",
+          "RR_TOTAL_P50_MMBOE": 420.22,
+          "DAYS_SINCE_PLANNED_START": 44
+        },
+        {
+          "NAMA_KEGIATAN": "Akuisisi Seismik 2D Middle Area South Jambi B 451 Km",
+          "WK": "SOUTH JAMBI \"B\" BLOCK",
+          "RR_TOTAL_P50_MMBOE": 190.01,
+          "DAYS_SINCE_PLANNED_START": 123
+        },
+        {
+          "NAMA_KEGIATAN": "Seismik 3D Tedong 100 Km2 Full Fold",
+          "WK": "PERTAMINA EP",
+          "RR_TOTAL_P50_MMBOE": 106.51,
+          "DAYS_SINCE_PLANNED_START": 215
+        }
+      ],
+      "action": "Eskalasi perizinan dan pengadaan untuk survei dengan potensi tertinggi"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "Absorpsi Anggaran Rendah",
+      "message": "Realisasi AFE survei hanya 0.0% ($0 dari $299,133,258)",
+      "action": "Review timeline procurement dan percepat proses AFE"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Studi Belum Dimulai",
+      "message": "Seluruh 187 studi masih berstatus 'Belum Mulai'",
+      "action": "Koordinasi kick-off segera dengan KKKS, prioritaskan Reprocessing (durasi terpendek)"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "Bottleneck Perizinan",
+      "message": "24 survei tertunda karena perizinan belum lengkap",
+      "action": "Eskalasi izin PPKH ke kementerian, jalankan pengadaan kontraktor paralel"
+    }
+  ],
+  "formatted_brief": "━━━ EXECUTIVE BRIEF GEOSURVAI ━━━\n📅 Data per: 04 March 2026\n\n📊 SURVEI SEISMIK (37 kegiatan):\n• Berjalan: 11 | Selesai: 2 | Belum Mulai: 24\n• Jenis: Seismik 3D (20), 2D (10), Lainnya (7)\n• Area: Onshore (10), Offshore (8)\n• Total AFE: $299,133,258 | Realisasi: $2,459,383 (0.8%)\n• Potensi Resource: 2,791.1 MMBOE (P50)\n• Avg Progress: 3.7%\n\n📚 STUDI GEOLOGI (187 kegiatan):\n• Belum Mulai: 187 | Selesai: 0\n• Anggaran: $30,435,555\n• Tipe: Studi G&G (86), Lab Analysis (69), Reprocessing (24), Studi MNK (8)\n\n📍 PER REGION (Survei):\n• Sulawesi: 4 survei, 1301.1 MMBOE, avg progress 0.0%\n• Papua dan Maluku: 2 survei, 501.4 MMBOE, avg progress 9.4%\n• Jawa, Bali, dan Nusa Tenggara: 1 survei, 420.2 MMBOE, avg progress 0.0%\n• nan: 20 survei, 308.6 MMBOE, avg progress 0.9%\n• Sumatera: 6 survei, 259.8 MMBOE, avg progress 16.7%\n• Kalimantan: 4 survei, 0.0 MMBOE, avg progress 0.0%\n\n⚠️ RISK ALERTS:\n• [HIGH] 4 survei terlambat dengan potensi total 731.7 MMBOE\n  → Aksi: Eskalasi perizinan dan pengadaan untuk survei dengan potensi tertinggi\n• [MEDIUM] Realisasi AFE survei hanya 0.0% ($0 dari $299,133,258)\n  → Aksi: Review timeline procurement dan percepat proses AFE\n• [HIGH] Seluruh 187 studi masih berstatus 'Belum Mulai'\n  → Aksi: Koordinasi kick-off segera dengan KKKS, prioritaskan Reprocessing (durasi terpendek)\n• [MEDIUM] 24 survei tertunda karena perizinan belum lengkap\n  → Aksi: Eskalasi izin PPKH ke kementerian, jalankan pengadaan kontraktor paralel\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+  "updated_at": "2026-03-04T10:18:56.274938"
+}
