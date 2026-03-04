@@ -12,7 +12,7 @@ google-genai
 httpx
 ollama
 
-# Vector store & embeddings
+# Vector store (without heavy default embedding models)
 chromadb
 
 # Scraper
