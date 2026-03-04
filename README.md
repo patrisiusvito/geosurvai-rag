@@ -1,3 +1,12 @@
+title: GeoSurvAI RAG
+emoji: 🌍
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+
+
 # GeoSurvAI RAG
 
 On-premise RAG system for monitoring seismic survey and geological study activities under SKK Migas. Features automated dashboard scraping, hybrid Text-to-SQL + Semantic querying, and a chat interface powered by Gemini.
