@@ -1,21 +1,23 @@
-# === LLM ===
-ollama==0.6.1
+# Web framework
+fastapi
+uvicorn[standard]
 
-# === Database ===
-duckdb==1.2.1
+# Database
+duckdb
+pandas
+openpyxl
 
-# === API Server ===
-fastapi==0.115.0
-uvicorn==0.34.0
-pydantic==2.10.0
+# LLM providers
+google-genai
+httpx
+ollama
 
-# === Data Processing ===
-pandas==2.2.3
-openpyxl==3.1.5
+# Vector store & embeddings
+chromadb
 
-# === HTTP Client ===
-httpx==0.28.0
+# Scraper
+playwright
+apscheduler
 
-# === Utilities ===
-python-dotenv==1.0.1
-loguru==0.7.3
+# Logging
+loguru
